@@ -1,0 +1,396 @@
+﻿using System;
+using System.Collections.Generic;
+using System.Linq;
+using System.Text;
+using Microsoft.Xna.Framework.Graphics;
+using Microsoft.Xna.Framework.Content;
+using Microsoft.Xna.Framework;
+using Microsoft.Xna.Framework.Input;
+
+namespace Shaper.Nature
+{
+    public class GameNatureOnePlayer : GameBase
+    {
+        public GameMain Game { get; set; }
+        public SpriteBatch SpriteBatch { get; set; }
+        public GraphicsDevice GraphicsDevice { get; set; }
+        public ContentManager ContentManager { get; set; }
+
+        private Texture2D pixel;
+
+        private Texture2D grass;
+        private Texture2D earth;
+        private Texture2D water;
+
+        private Grid grid;
+        private NatureBloc bloc;
+        private Vector2 nextPosition;
+        private int durtionPoingAnimation = 200;
+
+        public int BlocWidth { get { return earth.Width; } }
+        public int BlocHeight { get { return earth.Height; } }
+
+        #region Keys
+        private Keys keyTop1 = Keys.NumPad7;
+        private Keys keyTop2 = Keys.NumPad8;
+        private Keys keyTop3 = Keys.NumPad9;
+
+        private Keys keyLeft = Keys.NumPad4;
+        private Keys keyCenter = Keys.NumPad5;
+        private Keys keyRight = Keys.NumPad6;
+
+        private Keys keyBottom1 = Keys.NumPad1;
+        private Keys keyBottom2 = Keys.NumPad2;
+        private Keys keyBottom3 = Keys.NumPad3;
+
+        private bool keyStateTop1;
+        private bool keyStateTop2;
+        private bool keyStateTop3;
+
+        private bool keyStateLeft;
+        private bool keyStateCenter;
+        private bool keyStateRight;
+
+        private bool keyStateBottom1;
+        private bool keyStateBottom2;
+        private bool keyStateBottom3;
+        #endregion
+
+        AnimPoing[,] poingPos = new AnimPoing[3, 3];
+
+
+        public GameNatureOnePlayer(GameMain game, SpriteBatch spriteBatch, GraphicsDevice graphicsDevice, ContentManager contentManager) :  base(game, spriteBatch, graphicsDevice, contentManager)
+        {
+            Init();
+        }
+
+        #region Initialization
+        private void Init()
+        {
+            grass = ContentManager.Load<Texture2D>("Grass Block");
+            earth = ContentManager.Load<Texture2D>("Dirt Block");
+            //water = ContentManager.Load<Texture2D>("Water");
+
+
+            NewGame();
+
+            //--- Création du pixel
+            pixel = new Texture2D(GraphicsDevice, 1, 1, 1, TextureUsage.Linear, SurfaceFormat.Color);
+            pixel.SetData<Color>(new Color[] { Color.White });
+            //---
+        }
+        #endregion
+
+        public override void Update(Microsoft.Xna.Framework.GameTime gameTime)
+        {
+            this.bloc.Position.Y += (float)(this.bloc.Speed * gameTime.ElapsedGameTime.TotalMilliseconds);
+
+            UpdateKeyBoard(gameTime);
+
+            //UpdatePoingAnimation(gameTime);
+
+            //CheckColision(gameTime);
+        }
+
+        private void UpdatePoingAnimation(GameTime gameTime)
+        {
+            //for (int x = 0; x < 3; x++)
+            //{
+            //    for (int y = 0; y < 3; y++)
+            //    {
+            //        if (poingPos[x, y] != AnimPoing.Empty)
+            //        {
+            //            int elapsedTime = (int)gameTime.TotalRealTime.Subtract(poingPos[x, y].StatAnim).TotalMilliseconds;
+
+            //            if (elapsedTime >= durtionPoingAnimation)
+            //            {
+            //                poingPos[x, y] = AnimPoing.Empty;
+            //                bloc.Values[x, y] = Math.Abs(bloc.Values[x, y] - 1);
+            //            }
+            //            else
+            //            {
+            //                float pct = (float)elapsedTime / (float)durtionPoingAnimation;
+
+            //                poingPos[x, y].PosCalcule = poingPos[x, y].PosFinale * pct;
+            //            }
+            //        }
+            //    }
+            //}
+        }
+
+        private void UpdateKeyBoard(GameTime gameTime)
+        {
+            KeyboardState keyboardState = Keyboard.GetState();
+
+            //KeyBoardManager(ref keyStateTop1, keyboardState, keyTop1, 0, 0, gameTime);
+            //KeyBoardManager(ref keyStateTop2, keyboardState, keyTop2, 1, 0, gameTime);
+            //KeyBoardManager(ref keyStateTop3, keyboardState, keyTop3, 2, 0, gameTime);
+
+            //KeyBoardManager(ref keyStateLeft, keyboardState, keyLeft, 0, 1, gameTime);
+            //KeyBoardManager(ref keyStateCenter, keyboardState, keyCenter, 1, 1, gameTime);
+            //KeyBoardManager(ref keyStateRight, keyboardState, keyRight, 2, 1, gameTime);
+
+            //KeyBoardManager(ref keyStateBottom1, keyboardState, keyBottom1, 0, 2, gameTime);
+            //KeyBoardManager(ref keyStateBottom2, keyboardState, keyBottom2, 1, 2, gameTime);
+            //KeyBoardManager(ref keyStateBottom3, keyboardState, keyBottom3, 2, 2, gameTime);
+
+            if (keyboardState.IsKeyDown(Keys.Add))
+                bloc.Speed += 0.01f;
+            if (keyboardState.IsKeyDown(Keys.Subtract))
+                bloc.Speed -= 0.01f;
+        }
+
+        private void KeyBoardManager(ref bool keyState, KeyboardState keyboardState, Keys key, int x, int y, GameTime gameTime)
+        {
+            //if (keyState && keyboardState.IsKeyUp(key))
+            //{
+            //    poingPos[x, y].StatAnim = gameTime.TotalRealTime;
+
+            //    if (x == 0)
+            //        poingPos[x, y].PosFinale = new Vector2(x * BlocWidth + bloc.Position.X, y * bloc1.Height + bloc.Position.Y);
+            //    if (x == 1)
+            //    {
+            //        if (y == 0)
+            //            poingPos[x, y].PosFinale = new Vector2(x * BlocWidth + bloc.Position.X, y * bloc1.Height + bloc.Position.Y);
+            //        if (y == 2)
+            //            poingPos[x, y].PosFinale = new Vector2(x * BlocWidth + bloc.Position.X, (grid.Height - 1) * BlocHeight - y * bloc1.Height - bloc.Position.Y);
+            //    }
+            //    if (x == 2)
+            //        poingPos[x, y].PosFinale = new Vector2((grid.Width - 1) * BlocWidth - x * BlocWidth - bloc.Position.X, y * bloc1.Height + bloc.Position.Y);
+            //}
+
+            //keyState = keyboardState.IsKeyDown(key);
+        }
+
+        private float defaultX = 400;
+        private float defaultY = 50;
+
+        private void DrawBloc(NatureBloc natureBloc)
+        {
+            if (natureBloc is Earth)
+            {
+                SpriteBatch.Draw(earth, natureBloc.Position, Color.White);
+            }
+            else if (natureBloc is Grass)
+            {
+                SpriteBatch.Draw(grass, natureBloc.Position, Color.White);
+            }
+        }
+
+        public override void Draw(Microsoft.Xna.Framework.GameTime gameTime)
+        {
+            GraphicsDevice.Clear(new Color(25, 25, 30));
+
+            SpriteBatch.Begin();
+
+            SpriteBatch.Draw(pixel, new Rectangle((int)defaultX, (int)defaultY, (int)(BlocWidth * grid.Width), (int)(BlocHeight * grid.Height)), Color.Black);
+
+            //--- Lines
+            //for (int i = 0; i < 4; i++)
+            //{
+            //    Rectangle recV = new Rectangle((int)(defaultX + bloc.Position.X + i * BlocWidth - BlocWidth / 20), (int)defaultY, BlocWidth / 10, grid.Height * BlocHeight);
+            //    Rectangle recH = new Rectangle((int)defaultX, (int)(defaultY + bloc.Position.Y + i * BlocHeight - BlocHeight / 20), grid.Width * BlocWidth, BlocHeight / 10);
+
+            //    Color color = new Color(40, 50, 40);
+            //    SpriteBatch.Draw(pixel, recV, color);
+            //    SpriteBatch.Draw(pixel, recH, color);
+            //}
+            //---
+
+            //--- Bloc
+            //SpriteBatch.Draw(bloc1, bloc.Position + new Microsoft.Xna.Framework.Vector2(defaultX + x * BlocWidth, defaultY + y * BlocHeight), Color.White);
+            DrawBloc(bloc);
+            //---
+
+            //--- Grid
+            for (int x = 0; x < grid.Width; x++)
+            {
+                for (int y = 0; y < grid.Height; y++)
+                {
+                    if (grid.Values[x, y] != null)
+                    {
+                        //SpriteBatch.Draw(bloc0, new Microsoft.Xna.Framework.Vector2(defaultX + x * BlocWidth, defaultY + BlocHeight * (grid.Height-1) - y * BlocHeight), Color.White);
+                        DrawBloc(grid.Values[x, y]);
+                    }
+                }
+            }
+            //---
+
+            //--- Poing
+            //SpriteBatch.Draw(poingH, new Vector2(defaultX + bloc.Position.X + BlocWidth*1.5f, defaultY - poingH.Height + poingPos[1, 0].PosCalcule.Y), Color.White);
+            //SpriteBatch.Draw(poingB, new Vector2(defaultX + bloc.Position.X + BlocWidth * 1.5f, defaultY + (grid.Height) * BlocHeight - poingPos[1, 2].PosCalcule.Y), Color.White);
+
+            //for (int i = 0; i < 3; i++)
+            //{
+            //    SpriteBatch.Draw(poingG, new Vector2(defaultX - poingG.Width + poingPos[0, i].PosCalcule.X, defaultY + BlocHeight * (i+0.5f) + bloc.Position.Y), Color.White);
+            //    SpriteBatch.Draw(poingD, new Vector2(defaultX + BlocWidth * grid.Width - poingPos[2, i].PosCalcule.X, defaultY + BlocHeight * (i+0.5f) + bloc.Position.Y), Color.White);
+            //}
+            //---
+
+            SpriteBatch.End();
+        }
+
+        private void NewGame()
+        {
+            grid = new Grid(10, 20, BlocWidth, BlocHeight);
+            //bloc = new Bloc(new Vector2(5 * bloc1.Width, 0));
+
+            NewBloc(new GameTime());
+        }
+
+        private void NewBloc(GameTime gameTime)
+        {
+            Random rnd = new Random();
+
+            int blocType = rnd.Next(1, 3);
+
+            Vector2 pos = new Vector2(rnd.Next(grid.Width - 2) * BlocWidth, 0);
+
+            if (blocType == 1)
+                bloc = new Grass(pos.X, pos.Y);
+            else
+                bloc = new Earth(pos.X, pos.Y);
+
+            //bloc.Init(new Vector2(rnd.Next(grid.Width - 2) * bloc1.Width, 0), gameTime.ElapsedGameTime);
+
+            //--- Initialisation de l'animation des poings
+            //for (int x = 0; x < 3; x++)
+            //{
+            //    for (int y = 0; y < 3; y++)
+            //    {
+            //        poingPos[x, y] = AnimPoing.Empty;
+            //    }
+            //}
+            //---
+        }
+
+        public void CheckColision(GameTime gameTime)
+        {
+            //bool isColision = false;
+            //bool isGameOver = false;
+
+            //int posX = 0;
+            //int posY = 0;
+
+            //if (bloc.Position.Y> (BlocHeight * grid.Height-1))
+            //    NewBloc(gameTime);
+
+            //for (int x = 0; x < 3 && !isColision; x++)
+            //{
+            //    for (int y = 0; y < 3 && !isColision; y++)
+            //    {
+            //        if (bloc.Values[x, y] > 0)
+            //        {
+            //            Vector2 position = bloc.Position + new Vector2(x * bloc1.Width, y * bloc1.Height);
+
+            //            position /= bloc1.Width;
+
+            //            posX = (int)position.X;
+            //            posY = grid.Height - 1 - (int)Math.Round((double)position.Y, MidpointRounding.AwayFromZero);
+            //            //posY = grid.Height - 1 - (int)position.Y;
+
+            //            if (posY < grid.Height && (posY == -1 || grid.Values[posX, posY] > 0))
+            //            {
+            //                if (posY != -1)
+            //                    posY += y + 1;
+            //                else
+            //                    posY = 2;
+
+            //                posX -= x;
+            //                isColision = true;
+            //            }
+            //        }
+            //    }
+            //}
+
+            //if (isColision)
+            //{
+            //    for (int x = 0; x < 3 && !isGameOver; x++)
+            //    {
+            //        for (int y = 0; y < 3 && !isGameOver; y++)
+            //        {
+            //            if (bloc.Values[x, y] > 0)
+            //            {
+            //                if (posY - y >= grid.Height)
+            //                    isGameOver = true;
+            //                else
+            //                    grid.Values[posX + x, posY - y] = 1;
+            //            }
+            //        }
+            //    }
+
+            //    if (isGameOver)
+            //    {
+            //        NewGame();
+            //    }
+            //    else
+            //    {
+            //        CheckLine();
+            //        NewBloc(gameTime);
+            //    }
+            //}
+        }
+
+        private void CheckLine()
+        {
+            //for (int y = 0; y < grid.Height; y++)
+            //{
+            //    int count = grid.Width;
+
+            //    for (int x = 0; x < grid.Width; x++)
+            //    {
+            //        if (grid.Values[x, y] > 0) count--;
+
+            //        if (count == 0)
+            //        {
+
+            //            for (int y2 = y; y2 < grid.Height - 1; y2++)
+            //            {
+            //                for (int x2 = 0; x2 < grid.Width; x2++)
+            //                {
+            //                    grid.Values[x2, y2] = grid.Values[x2, y2 + 1];
+            //                }
+            //            }
+
+            //            y--;
+            //        }
+            //    }
+            //}
+        }
+    }
+
+    public struct AnimPoing
+    {
+        public TimeSpan StatAnim;
+        public Vector2 PosFinale;
+        public Vector2 PosCalcule;
+
+        public static AnimPoing Empty
+        {
+            get
+            {
+                AnimPoing empty = new AnimPoing();
+                empty.PosFinale = Vector2.Zero;
+                empty.StatAnim = TimeSpan.Zero;
+                return empty;
+            }
+        }
+
+        public static bool operator ==(AnimPoing a1, AnimPoing a2)
+        {
+            if (a1 == null && a2 == null)
+                return true;
+            if (a1 != null && a2 == null || a1 == null && a2 != null)
+                return false;
+            else
+            {
+                return (a1.PosFinale == a2.PosFinale && a1.StatAnim == a2.StatAnim);
+            }
+        }
+
+        public static bool operator !=(AnimPoing a1, AnimPoing a2)
+        {
+            return !(a1 == a2);
+        }
+    }
+}
