@@ -146,7 +146,7 @@ namespace Shaper.Etang
             base.Init();
         }
 
-        void GameEtang_MenuAnimationOpenEnded()
+        void GameEtang_MenuAnimationOpenEnded(GameTime gameTime)
         {
             this.Game.GameCurrent = new GameMenu(this.Game, this.SpriteBatch, this.GraphicsDevice, this.ContentManager);
         }
@@ -212,12 +212,12 @@ namespace Shaper.Etang
         #endregion
 
         #region Évènements
-        void GameEtang_KeyPressed(Keys key)
+        void GameEtang_KeyPressed(Keys key, GameTime gameTime)
         {
             throw new NotImplementedException();
         }
 
-        void GameEtang_MouseLeftButtonClicked(MouseState mouseState)
+        void GameEtang_MouseLeftButtonClicked(MouseState mouseState, GameTime gameTime)
         {
             //--- Création du cercle
             Circle circle = new Circle { Position = new Vector2(mouseState.X, mouseState.Y), Size = 2, Life = 100 };
@@ -225,9 +225,9 @@ namespace Shaper.Etang
             //---
         }
 
-        void txtMenu_ClickImage(ClickableImage image, MouseState mouseState)
+        void txtMenu_ClickImage(ClickableImage image, MouseState mouseState, GameTime gameTime)
         {
-            this.StartMenuOn(DateTime.Now.TimeOfDay);
+            this.StartMenuOn(gameTime);
         }
         #endregion
 

@@ -95,7 +95,7 @@ namespace Shaper
             base.Init(true);
         }
 
-        void GameMenu_MenuAnimationCloseEnded()
+        void GameMenu_MenuAnimationCloseEnded(GameTime gameTime)
         {
             currentMenuItem();
         }
@@ -144,33 +144,33 @@ namespace Shaper
         }
 
         #region Evènements
-        void txtFleur_ClickText(ClickableText clickableText, Microsoft.Xna.Framework.Input.MouseState mouseState)
+        void txtFleur_ClickText(ClickableText clickableText, Microsoft.Xna.Framework.Input.MouseState mouseState, GameTime gameTime)
         {
-            this.StartMenuOff(DateTime.Now.TimeOfDay);
+            this.StartMenuOff(gameTime);
             currentMenuItem = ShowFleurGame;
         }
 
-        void txtEtang_ClickText(ClickableText clickableText, Microsoft.Xna.Framework.Input.MouseState mouseState)
+        void txtEtang_ClickText(ClickableText clickableText, Microsoft.Xna.Framework.Input.MouseState mouseState, GameTime gameTime)
         {
-            this.StartMenuOff(DateTime.Now.TimeOfDay);
+            this.StartMenuOff(gameTime);
             currentMenuItem = ShowEtangGame;
         }
 
-        void txtTriangle_ClickText(ClickableText clickableText, Microsoft.Xna.Framework.Input.MouseState mouseState)
+        void txtTriangle_ClickText(ClickableText clickableText, Microsoft.Xna.Framework.Input.MouseState mouseState, GameTime gameTime)
         {
-            this.StartMenuOff(DateTime.Now.TimeOfDay);
+            this.StartMenuOff(gameTime);
             currentMenuItem = ShowTriangleOnePlayerGame;
         }
 
-        void txtNature_ClickText(ClickableText clickableText, Microsoft.Xna.Framework.Input.MouseState mouseState)
+        void txtNature_ClickText(ClickableText clickableText, Microsoft.Xna.Framework.Input.MouseState mouseState, GameTime gameTime)
         {
-            this.StartMenuOff(DateTime.Now.TimeOfDay);
+            this.StartMenuOff(gameTime);
             currentMenuItem = ShowNatureOnePlayerGame;
         }
 
-        void txtBloc_ClickText(ClickableText clickableText, Microsoft.Xna.Framework.Input.MouseState mouseState)
+        void txtBloc_ClickText(ClickableText clickableText, Microsoft.Xna.Framework.Input.MouseState mouseState, GameTime gameTime)
         {
-            this.StartMenuOff(DateTime.Now.TimeOfDay);
+            this.StartMenuOff(gameTime);
             currentMenuItem = ShowBlocOnePlayerGame;
         }
         #endregion

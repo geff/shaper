@@ -38,22 +38,22 @@ namespace Shaper
         private ButtonState mouseRightButtonState { get; set; }
         private ButtonState mouseMiddleButtonState { get; set; }
 
-        public delegate void KeyPressedHandler(Keys key);
+        public delegate void KeyPressedHandler(Keys key, GameTime gameTime);
         public event KeyPressedHandler KeyPressed;
 
-        public delegate void MouseLeftButtonClickedHandler(MouseState mouseState);
+        public delegate void MouseLeftButtonClickedHandler(MouseState mouseState, GameTime gameTime);
         public event MouseLeftButtonClickedHandler MouseLeftButtonClicked;
 
-        public delegate void MouseRightButtonClickedHandler(MouseState mouseState);
+        public delegate void MouseRightButtonClickedHandler(MouseState mouseState, GameTime gameTime);
         public event MouseRightButtonClickedHandler MouseRightButtonClicked;
 
-        public delegate void MouseMidddleButtonClickedHandler(MouseState mouseState);
+        public delegate void MouseMidddleButtonClickedHandler(MouseState mouseState, GameTime gameTime);
         public event MouseMidddleButtonClickedHandler MouseMidddleButtonClicked;
 
-        public delegate void MenuAnimationCloseEndedHandler();
+        public delegate void MenuAnimationCloseEndedHandler(GameTime gameTime);
         public event MenuAnimationCloseEndedHandler MenuAnimationCloseEnded;
 
-        public delegate void MenuAnimationOpenEndedHandler();
+        public delegate void MenuAnimationOpenEndedHandler(GameTime gameTime);
         public event MenuAnimationOpenEndedHandler MenuAnimationOpenEnded;
 
         public GameBase(GameMain game, SpriteBatch spriteBatch, GraphicsDevice graphicsDevice, ContentManager contentManager)
@@ -125,21 +125,21 @@ namespace Shaper
         }
 
         #region Évènements
-        void keyManager_KeyPressed(Keys key)
+        void keyManager_KeyPressed(Keys key, GameTime gameTime)
         {
             if (KeyPressed != null)
-                KeyPressed(key);
+                KeyPressed(key, gameTime);
         }
         #endregion
 
-        protected void StartMenuOn(TimeSpan gameTime)
+        protected void StartMenuOn(GameTime gameTime)
         {
-            timeStartMenuOn = gameTime;
+            timeStartMenuOn = gameTime.TotalGameTime;
         }
 
-        protected void StartMenuOff(TimeSpan gameTime)
+        protected void StartMenuOff(GameTime gameTime)
         {
-            timeStartMenuOff = gameTime;
+            timeStartMenuOff = gameTime.TotalGameTime;
         }
 
         protected void AddKeys(Keys key)
@@ -170,17 +170,17 @@ namespace Shaper
                 //---
                 for (int i = 0; i < listKeys.Count; i++)
                 {
-                    listKeys[i].Update(keyboardState);
+                    listKeys[i].Update(keyboardState, gameTime);
                 }
 
                 if (MouseLeftButtonClicked != null && mouseLeftButtonState == ButtonState.Pressed && mouseState.LeftButton == ButtonState.Released)
-                    MouseLeftButtonClicked(mouseState);
+                    MouseLeftButtonClicked(mouseState, gameTime);
 
                 if (MouseRightButtonClicked != null && mouseRightButtonState == ButtonState.Pressed && mouseState.RightButton == ButtonState.Released)
-                    MouseRightButtonClicked(mouseState);
+                    MouseRightButtonClicked(mouseState, gameTime);
 
                 if (MouseMidddleButtonClicked != null && mouseMiddleButtonState == ButtonState.Pressed && mouseState.MiddleButton == ButtonState.Released)
-                    MouseMidddleButtonClicked(mouseState);
+                    MouseMidddleButtonClicked(mouseState, gameTime);
 
                 mouseLeftButtonState = mouseState.LeftButton;
                 mouseRightButtonState = mouseState.RightButton;
@@ -202,8 +202,8 @@ namespace Shaper
                 //---
 
                 //---
-                UpdateMenuOn(DateTime.Now.TimeOfDay);
-                UpdateMenuOff(DateTime.Now.TimeOfDay);
+                UpdateMenuOn(gameTime);
+                UpdateMenuOff(gameTime);
                 //---
             }
 
@@ -240,11 +240,11 @@ namespace Shaper
             //---
         }
 
-        private void UpdateMenuOn(TimeSpan gameTime)
+        private void UpdateMenuOn(GameTime gameTime)
         {
             if (timeStartMenuOn != TimeSpan.Zero)
             {
-                int deltaMs = (int)gameTime.Subtract(timeStartMenuOn).TotalMilliseconds;
+                int deltaMs = (int)gameTime.TotalGameTime.Subtract(timeStartMenuOn).TotalMilliseconds;
 
                 float pct = (float)deltaMs / timeChange;
 
@@ -259,16 +259,16 @@ namespace Shaper
                     timeStartMenuOn = TimeSpan.Zero;
 
                     if (this.MenuAnimationOpenEnded != null)
-                        this.MenuAnimationOpenEnded();
+                        this.MenuAnimationOpenEnded(gameTime);
                 }
             }
         }
 
-        private void UpdateMenuOff(TimeSpan gameTime)
+        private void UpdateMenuOff(GameTime gameTime)
         {
             if (timeStartMenuOff != TimeSpan.Zero)
             {
-                int deltaMs = (int)gameTime.Subtract(timeStartMenuOff).TotalMilliseconds;
+                int deltaMs = (int)gameTime.TotalGameTime.Subtract(timeStartMenuOff).TotalMilliseconds;
 
                 float pct = (float)deltaMs / timeChange;
 
@@ -282,7 +282,7 @@ namespace Shaper
                     timeStartMenuOff = TimeSpan.Zero;
 
                     if (this.MenuAnimationCloseEnded != null)
-                        this.MenuAnimationCloseEnded();
+                        this.MenuAnimationCloseEnded(gameTime);
                 }
             }
         }

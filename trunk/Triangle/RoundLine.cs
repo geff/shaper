@@ -160,7 +160,7 @@ namespace RoundLineCode
         public void Init(GraphicsDevice device, ContentManager content)
         {
             this.device = device;
-            effect = content.Load<Effect>("../Shader/RoundLine");
+            effect = content.Load<Effect>("Content/Shader/RoundLine");
             viewProjMatrixParameter = effect.Parameters["viewProj"];
             instanceDataParameter = effect.Parameters["instanceData"];
             timeParameter = effect.Parameters["time"];

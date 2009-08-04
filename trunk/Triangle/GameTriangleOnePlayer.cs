@@ -13,11 +13,6 @@ namespace Shaper.Triangle
     public class GameTriangleOnePlayer : GameBase
     {
         #region Properties
-        public GameMain Game { get; set; }
-        public SpriteBatch SpriteBatch { get; set; }
-        public GraphicsDevice GraphicsDevice { get; set; }
-        public ContentManager ContentManager { get; set; }
-
         public delegate void ActionOnGridDelegate(Triangle triangle);
 
         private TriangleRender render;
@@ -39,55 +34,36 @@ namespace Shaper.Triangle
 
         List<Triangle> listIntersectedTriangle = null;
 
-
         bool triangleActivated = false;
         int countTriangleActivated = 0;
+        bool triangleMoved = false;
 
         public Triangle currentTriangle = null;
         float angleClick = 0f;
-        ButtonState prevLeftButtonState = ButtonState.Released;
-        ButtonState prevRightButtonState = ButtonState.Released;
-        #endregion
-
-        #region Keys
-        private Keys keyTop1 = Keys.NumPad7;
-        private Keys keyTop2 = Keys.NumPad8;
-        private Keys keyTop3 = Keys.NumPad9;
-
-        private Keys keyLeft = Keys.NumPad4;
-        private Keys keyCenter = Keys.NumPad5;
-        private Keys keyRight = Keys.NumPad6;
-
-        private Keys keyBottom1 = Keys.NumPad1;
-        private Keys keyBottom2 = Keys.NumPad2;
-        private Keys keyBottom3 = Keys.NumPad3;
-
-        private bool keyStateTop1;
-        private bool keyStateTop2;
-        private bool keyStateTop3;
-
-        private bool keyStateLeft;
-        private bool keyStateCenter;
-        private bool keyStateRight;
-
-        private bool keyStateBottom1;
-        private bool keyStateBottom2;
-        private bool keyStateBottom3;
         #endregion
 
         public GameTriangleOnePlayer(GameMain game, SpriteBatch spriteBatch, GraphicsDevice graphicsDevice, ContentManager contentManager)
             : base(game, spriteBatch, graphicsDevice, contentManager)
         {
             this.Game = game;
-            this.render = new TriangleRender(this, Game, SpriteBatch, GraphicsDevice, ContentManager);
+            this.render = new TriangleRender(this, game, spriteBatch, graphicsDevice, contentManager);
 
             Init();
         }
 
-
         #region Initialization
         private void Init()
         {
+            //--- Evènements
+            this.MouseLeftButtonClicked += new MouseLeftButtonClickedHandler(GameTriangleOnePlayer_MouseLeftButtonClicked);
+            this.MouseRightButtonClicked += new MouseRightButtonClickedHandler(GameTriangleOnePlayer_MouseRightButtonClicked);
+            this.KeyPressed += new KeyPressedHandler(GameTriangleOnePlayer_KeyPressed);
+            //---
+
+            //---
+            this.AddKeys(Keys.Space);
+            //---
+
             render.Initialize();
 
             grid = new Grid(6, 10);
@@ -97,47 +73,20 @@ namespace Shaper.Triangle
                 triangle.CalcPoints(TriWidth);
             });
 
-        }
-        #endregion
-
-        #region Update
-        public override void Update(Microsoft.Xna.Framework.GameTime gameTime)
-        {
-            UpdateKeyBoard(gameTime);
-            UpdateMouse(gameTime);
-            UpdateTimeOver(gameTime);
-            UpdateTriangleMove(gameTime);
+            base.Init();
         }
 
-        private void UpdateKeyBoard(GameTime gameTime)
+        void GameTriangleOnePlayer_KeyPressed(Keys key, GameTime gameTime)
         {
-            KeyboardState keyboardState = Keyboard.GetState();
-
-            if (keyboardState.IsKeyDown(Keys.Space))
+            if(key == Keys.Space)
                 SetTimeOver(gameTime);
         }
 
-        private void SaveMouseState(MouseState mouseState)
+        void GameTriangleOnePlayer_MouseRightButtonClicked(MouseState mouseState, GameTime gameTime)
         {
-            prevLeftButtonState = mouseState.LeftButton;
-            prevRightButtonState = mouseState.RightButton;
-        }
-
-        private void UpdateMouse(GameTime gameTime)
-        {
-            MouseState mouseState = Mouse.GetState();
-            Point mousePoint = new Point(mouseState.X, mouseState.Y);
-
             bool exit = false;
 
-            //--- Validation du triangle en cours
-            if (LeftMouseClick(mouseState) && currentTriangle != null)
-            {
-                currentTriangle = null;
-                SaveMouseState(mouseState);
-                return;
-            }
-            //---
+            Point mousePoint = new Point(mouseState.X, mouseState.Y);
 
             for (int x = 0; x < grid.Width && !exit; x++)
             {
@@ -155,19 +104,50 @@ namespace Shaper.Triangle
                         triangle.Selected = rec.Contains(mousePoint);
 
                         //--- Désactivation du triangle en cours
-                        if (RightMouseClick(mouseState) && currentTriangle != null)
+                        if (currentTriangle != null)
                         {
                             currentTriangle.Activated = false;
                             currentTriangle = null;
                         }
                         //--- Désactivation du triangle cliqué
-                        else if (RightMouseClick(mouseState) && currentTriangle == null && selected && triangle.Activated)
+                        else if (currentTriangle == null && selected && triangle.Activated)
                         {
                             triangle.Activated = false;
                         }
+                    }
+                }
+            }
+        }
+
+        void GameTriangleOnePlayer_MouseLeftButtonClicked(MouseState mouseState, GameTime gameTime)
+        {
+            if (currentTriangle != null)
+            {
+                currentTriangle = null;
+                return;
+            }
+
+            bool exit = false;
+
+            Point mousePoint = new Point(mouseState.X, mouseState.Y);
+
+            for (int x = 0; x < grid.Width && !exit; x++)
+            {
+                for (int y = 0; y < grid.Height && !exit; y++)
+                {
+                    if (grid.Values[x, y] != null)
+                    {
+                        Triangle triangle = grid.Values[x, y];
+
+                        Rectangle rec = new Rectangle(
+                            (int)(defaultX + ((float)triangle.PosGridX) * (float)TriWidth),
+                            (int)(defaultY + (float)TriHeight * (float)(grid.Height - 1 - (float)triangle.PosGridY + 0.0f)), TriWidth, TriHeight);
+
+                        bool selected = rec.Contains(mousePoint);
+                        triangle.Selected = rec.Contains(mousePoint);
 
                         //--- Sélection du nouveau triangle
-                        if (LeftMouseClick(mouseState) && currentTriangle == null && selected)
+                        if (currentTriangle == null && selected)
                         {
                             if (firstActivatedTriangle != null && firstActivatedTriangle.Color != triangle.Color)
                                 break;
@@ -186,10 +166,27 @@ namespace Shaper.Triangle
                     }
                 }
             }
+        }
+        #endregion
+
+        #region Update
+        public override void Update(Microsoft.Xna.Framework.GameTime gameTime)
+        {
+            UpdateTimeOver(gameTime);
+            UpdateTriangleMove(gameTime);
+            UpdateMouseMove(gameTime);
+
+            base.Update(gameTime);
+        }
+
+        private void UpdateMouseMove(GameTime gameTime)
+        {
+            MouseState mouseState = Mouse.GetState();
+            Point mousePoint = new Point(mouseState.X, mouseState.Y);
 
             CalcTriangleActivated();
 
-            if (currentTriangle != null)// && currentTriangle == firstActivatedTriangle)
+            if (currentTriangle != null)
             {
                 currentTriangle.Angle = currentTriangle.PrevAngle + MathShaper.GetAngle(currentTriangle.PosX, currentTriangle.PosY, mouseState.X, mouseState.Y) - angleClick;
                 currentTriangle.CalcPoints(TriWidth);
@@ -204,8 +201,6 @@ namespace Shaper.Triangle
             {
                 CalcFieldOfIntersection(currentTriangle);
             }
-
-            SaveMouseState(mouseState);
         }
 
         private void UpdateTimeOver(GameTime gameTime)
@@ -217,8 +212,6 @@ namespace Shaper.Triangle
                 SetTimeOver(gameTime);
             }
         }
-
-        bool triangleMoved = false;
 
         private void UpdateTriangleMove(GameTime gameTime)
         {
@@ -532,16 +525,6 @@ namespace Shaper.Triangle
         #endregion
 
         #region Private methods
-        private bool LeftMouseClick(MouseState mouseState)
-        {
-            return (prevLeftButtonState == ButtonState.Pressed && mouseState.LeftButton == ButtonState.Released);
-        }
-
-        private bool RightMouseClick(MouseState mouseState)
-        {
-            return (prevRightButtonState == ButtonState.Pressed && mouseState.RightButton == ButtonState.Released);
-        }
-
         private void NewLines()
         {
             listLine = new List<Line>();
@@ -593,7 +576,9 @@ namespace Shaper.Triangle
         {
             render.Draw(gameTime);
 
+            SpriteBatch.Begin();
             base.Draw(gameTime);
+            SpriteBatch.End();
         }
     }
 }
