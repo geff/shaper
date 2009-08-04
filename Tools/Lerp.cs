@@ -20,6 +20,9 @@ namespace Shaper.Tools
         private bool isLooping;
         private float sens;
 
+        private bool stopped;
+        private float valueStopped;
+
         public Lerp(float min, float max, Boolean loop, Boolean reverse, int duration, float step)
         {
             this.Min = min;
@@ -31,14 +34,24 @@ namespace Shaper.Tools
             this.startValue = min;
 
             this.startTime = TimeSpan.MinValue;
-            this.sens = min< max ? 1f:-1f;
+            this.sens = min < max ? 1f : -1f;
+        }
+
+        public float Eval(GameTime gameTime, Boolean stop)
+        {
+            valueStopped = Eval(gameTime);
+            stopped = stop;
+            return valueStopped;
         }
 
         public float Eval(GameTime gameTime)
         {
+            if (stopped)
+                return valueStopped;
+
             float ret;
 
-            if(startTime == TimeSpan.MinValue)
+            if (startTime == TimeSpan.MinValue)
                 startTime = gameTime.TotalGameTime;
 
             if (Step != -1)
@@ -47,7 +60,7 @@ namespace Shaper.Tools
             }
             else
             {
-                ret = startValue + this.sens * (float)gameTime.TotalGameTime.Subtract(startTime).TotalMilliseconds / (float)this.Duration* Math.Abs(this.Max-this.Min);
+                ret = startValue + this.sens * (float)gameTime.TotalGameTime.Subtract(startTime).TotalMilliseconds / (float)this.Duration * Math.Abs(this.Max - this.Min);
             }
 
             if (ret >= Max && this.Reverse)

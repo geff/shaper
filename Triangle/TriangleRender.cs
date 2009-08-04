@@ -6,7 +6,6 @@ using Microsoft.Xna.Framework.Content;
 using Microsoft.Xna.Framework.Graphics;
 using Microsoft.Xna.Framework;
 using FarseerGames.GettingStarted.DrawingSystem;
-using Hilva.PostProcess;
 using Shaper.Drawingsystem;
 using RoundLineCode;
 
@@ -117,7 +116,7 @@ namespace Shaper.Triangle
             // Create a new default effect containing universal
             // vertex and pixel shaders that we can use to draw our triangle
             //this.colorEffect = new BasicEffect(GraphicsDevice, null);
-            this.colorEffect = this.ContentManager.Load<Effect>("../Shader/ColorFiller");
+            this.colorEffect = this.ContentManager.Load<Effect>("Content/Shader/ColorFiller");
 
 
             //---------
@@ -136,7 +135,7 @@ namespace Shaper.Triangle
 
 
 
-            monoEffect = new Monochrome(GraphicsDevice);
+            //monoEffect = new Monochrome(GraphicsDevice);
 
             Create2DProjectionMatrix();
         }
@@ -167,7 +166,7 @@ namespace Shaper.Triangle
             projMatrix.M43 = 0.5f;
         }
 
-        Monochrome monoEffect;
+        //Monochrome monoEffect;
         ResolveTexture2D colorBuffer;
         RenderTarget2D r;
 

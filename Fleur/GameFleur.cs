@@ -62,7 +62,7 @@ namespace Shaper.Fleur
             listColor.Add(Color.Cyan);
             //---
 
-            listColorFlower.Add(listColor[0]); 
+            listColorFlower.Add(listColor[0]);
             listColorFlower.Add(Color.Lerp(listColor[0], listColor[1], 0.5f));
             listColorFlower.Add(listColor[1]);
             listColorFlower.Add(Color.Lerp(listColor[1], listColor[2], 0.5f));
@@ -78,7 +78,7 @@ namespace Shaper.Fleur
 
                 Fleur fleur = new Fleur();
                 fleur.Position = new Vector2(posX, posY);
-                fleur.Couleur = listColorFlower[rnd.Next(0,listColorFlower.Count)];
+                fleur.Couleur = listColorFlower[rnd.Next(0, listColorFlower.Count)];
                 fleur.Visible = true;
 
                 listFleur.Add(fleur);
@@ -88,30 +88,30 @@ namespace Shaper.Fleur
             base.Init();
         }
 
-        void GameFleur_MenuAnimationOpenEnded()
+        void GameFleur_MenuAnimationOpenEnded(GameTime gameTime)
         {
             this.Game.GameCurrent = new GameMenu(this.Game, this.SpriteBatch, this.GraphicsDevice, this.ContentManager);
         }
         #endregion
 
         #region Évènements
-        void GameFleur_KeyPressed(Keys key)
+        void GameFleur_KeyPressed(Keys key, GameTime gameTime)
         {
         }
 
-        void GameFleur_MouseLeftButtonClicked(MouseState mouseState)
+        void GameFleur_MouseLeftButtonClicked(MouseState mouseState, GameTime gameTime)
         {
             nbClick++;
 
             //--- Création du cercle
-            Circle circle = new Circle { Position = new Vector2(mouseState.X, mouseState.Y), Size = 2, Life = 100, Color = listColor[nbClick%listColor.Count] };
+            Circle circle = new Circle { Position = new Vector2(mouseState.X, mouseState.Y), Life = 100, Color = listColor[nbClick % listColor.Count] };
             listCircle.Add(circle);
             //---
         }
 
-        void txtMenu_ClickImage(ClickableImage image, MouseState mouseState)
+        void txtMenu_ClickImage(ClickableImage image, MouseState mouseState, GameTime gameTime)
         {
-            this.StartMenuOn(DateTime.Now.TimeOfDay);
+            this.StartMenuOn(gameTime);
         }
         #endregion
 
@@ -128,10 +128,10 @@ namespace Shaper.Fleur
         {
             foreach (Circle circle in listCircle)
             {
-                circle.Size += 1;
-
-                if (circle.Size > 800)
-                    circle.Life--;
+                if (circle.Size(gameTime) >= 1f)
+                {
+                    circle.Life = 0;
+                }
             }
 
             listCircle.RemoveAll(c => c.Life == 0);
@@ -151,9 +151,9 @@ namespace Shaper.Fleur
 
                     foreach (Circle circle in listCircle)
                     {
-                        float distance = Vector2.Distance(circle.Position, fleur.Position - new Vector2(fleur0Tx.Width / 2, fleur0Tx.Height / 2));
+                        float distance = Vector2.Distance(circle.Position, fleur.Position);
 
-                        if (distance <= circle.Size)
+                        if (distance <= circle.Size(gameTime) * (float)circleTx.Width / 2f)
                         {
                             nbColorOnFlower++;
 
@@ -169,7 +169,7 @@ namespace Shaper.Fleur
                         g /= nbColorOnFlower;
                         b /= nbColorOnFlower;
 
-                        Color colorOnFlower = new Color((byte)r,(byte)g,(byte)b);
+                        Color colorOnFlower = new Color((byte)r, (byte)g, (byte)b);
 
                         fleur.Catched = (fleur.Couleur == colorOnFlower);
                     }
@@ -190,23 +190,18 @@ namespace Shaper.Fleur
 
             foreach (Circle circle in listCircle)
             {
-                Vector2 pos = circle.Position - new Vector2(circle.Size / 2);
-                SpriteBatch.Draw(circleTx, new Rectangle((int)pos.X, (int)pos.Y, circle.Size, circle.Size), circle.Color);
+                SpriteBatch.Draw(circleTx, circle.Position, null, circle.Color, 0f, new Vector2(circleTx.Width, circleTx.Height) / 2, circle.Size(gameTime), SpriteEffects.None, 0f);
             }
 
             foreach (Fleur fleur in listFleur)
             {
-                if(fleur.Visible)
+                if (fleur.Visible)
                     SpriteBatch.Draw(fleur0Tx, fleur.Position, null, new Microsoft.Xna.Framework.Graphics.Color(fleur.Couleur, fleur.Alpha(gameTime)), fleur.Rotation(gameTime), new Vector2(fleur0Tx.Width / 2, fleur0Tx.Height / 2), fleur.Size(gameTime), SpriteEffects.None, 1f);
             }
 
             base.Draw(gameTime);
 
             SpriteBatch.End();
-        }
-
-        private void NewGame()
-        {
         }
     }
 }

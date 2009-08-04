@@ -35,7 +35,7 @@ namespace Shaper
         #endregion
 
         #region Evènements
-        public delegate void ClickImageHandler(ClickableImage image, MouseState mouseState);
+        public delegate void ClickImageHandler(ClickableImage image, MouseState mouseState, GameTime gameTime);
         public event ClickImageHandler ClickImage;
         #endregion
 
@@ -66,7 +66,7 @@ namespace Shaper
                 else if (mouseState.LeftButton == ButtonState.Released && leftMouseButtonState == ButtonState.Pressed && ClickImage != null)
                 {
                     leftMouseButtonState = ButtonState.Released;
-                    ClickImage(this, mouseState);
+                    ClickImage(this, mouseState, gameTime);
                 }
             }
             else

@@ -36,7 +36,7 @@ namespace Shaper
         #endregion
 
         #region Evènements
-        public delegate void ClickTextHandler(ClickableText clickableText, MouseState mouseState);
+        public delegate void ClickTextHandler(ClickableText clickableText, MouseState mouseState, GameTime gameTime);
         public event ClickTextHandler ClickText;
         #endregion
 
@@ -68,7 +68,7 @@ namespace Shaper
                 else if (mouseState.LeftButton == ButtonState.Released && leftMouseButtonState == ButtonState.Pressed && ClickText != null)
                 {
                     leftMouseButtonState = ButtonState.Released;
-                    ClickText(this, mouseState);
+                    ClickText(this, mouseState, gameTime);
                 }
             }
             else
